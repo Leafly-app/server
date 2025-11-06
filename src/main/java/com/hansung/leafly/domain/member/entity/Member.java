@@ -1,5 +1,6 @@
 package com.hansung.leafly.domain.member.entity;
 
+import com.hansung.leafly.domain.member.entity.enums.MemberRole;
 import com.hansung.leafly.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,14 +23,18 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, name = "nick_name")
+    private String nickName;
 
-    public static Member toEntity(String email, String encoded, String name){
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
+
+    public static Member toEntity(String email, String encoded, String nickName){
         return Member.builder()
                 .email(email)
                 .password(encoded)
-                .name(name)
+                .nickName(nickName)
+                .role(MemberRole.USER)
                 .build();
     }
 }
