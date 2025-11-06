@@ -45,7 +45,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(member.getEmail())
-                .claim("name", member.getName())
+                .claim("name", member.getNickName())
                 .claim("role", member.getRole())
                 .issuedAt(now)
                 .expiration(expiry)

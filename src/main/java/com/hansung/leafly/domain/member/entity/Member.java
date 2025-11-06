@@ -23,17 +23,17 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(nullable = false, name = "nick_name")
+    private String nickName;
 
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    public static Member toEntity(String email, String encoded, String name){
+    public static Member toEntity(String email, String encoded, String nickName){
         return Member.builder()
                 .email(email)
                 .password(encoded)
-                .name(name)
+                .nickName(nickName)
                 .role(MemberRole.USER)
                 .build();
     }

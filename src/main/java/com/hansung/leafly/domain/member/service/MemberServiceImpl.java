@@ -12,6 +12,7 @@ import com.hansung.leafly.global.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,17 +22,19 @@ public class MemberServiceImpl implements MemberService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
+    @Transactional
     public void signUp(SignUpReq signUpReq) {
         if(memberRepository.existsByEmail(signUpReq.getEmail())){
             throw new MemberAlreadyExistException();
         }
         String encoded = passwordEncoder.encode(signUpReq.getPassword());
-        Member member = Member.toEntity(signUpReq.getEmail(), encoded, signUpReq.getName());
+        Member member = Member.toEntity(signUpReq.getEmail(), encoded, signUpReq.getNickname());
 
         memberRepository.save(member);
     }
 
     @Override
+    @Transactional
     public LoginRes login(LoginReq loginReq) {
         // 아이디 확인
         Member member = memberRepository.findByEmail(loginReq.getEmail())
