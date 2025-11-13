@@ -4,6 +4,7 @@ import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.domain.member.service.MemberService;
 import com.hansung.leafly.domain.member.web.dto.LoginReq;
 import com.hansung.leafly.domain.member.web.dto.LoginRes;
+import com.hansung.leafly.domain.member.web.dto.OnboardingReq;
 import com.hansung.leafly.domain.member.web.dto.SignUpReq;
 import com.hansung.leafly.global.auth.security.CustomMemberDetails;
 import com.hansung.leafly.global.response.SuccessResponse;
@@ -36,11 +37,13 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(loginRes));
     }
 
-    // 인가 테스트용 API
-    @GetMapping("/profile")
-    public ResponseEntity<LoginRes> getProfile(@AuthenticationPrincipal CustomMemberDetails memberDetails) {
-        Member member = memberDetails.getMember();
-        return ResponseEntity
-                .ok(new LoginRes(member.getRole().getStringRole()));
+    //회원 온보딩 저장
+    @PostMapping("/onboarding")
+    public ResponseEntity<SuccessResponse<?>> onboarding(
+            @AuthenticationPrincipal CustomMemberDetails memberDetails,
+            @RequestBody @Valid OnboardingReq req
+    ){
+        memberService.onboarding(memberDetails.getMember(), req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created(null));
     }
 }

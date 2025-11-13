@@ -29,6 +29,9 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Onboarding onboarding;
+
     public static Member toEntity(String email, String encoded, String nickName){
         return Member.builder()
                 .email(email)
