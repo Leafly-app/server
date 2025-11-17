@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE: ${{ secrets.DOCKER_USERNAME }}/[소문자로 시작하는 프로젝트명]
+  IMAGE: ${{ secrets.DOCKER_USERNAME }}/leafly
 
 jobs:
   deploy:
@@ -34,9 +34,9 @@ jobs:
             docker pull ${{ env.IMAGE }}:latest
 
             echo "[2/3] Restart container with new image..."
-            docker stop [이미지명(소문자로 시작하는 프로젝트명)] || true
-            docker rm [이미지명(소문자로 시작하는 프로젝트명)] || true
-            docker run -d --name [이미지명(소문자로 시작하는 프로젝트명)] \
+            docker stop leafly || true
+            docker rm leafly || true
+            docker run -d --name leafly \
               --env-file /home/${{ secrets.SERVER_USER }}/.env \
               -p 8080:8080 \
               ${{ env.IMAGE }}:latest
