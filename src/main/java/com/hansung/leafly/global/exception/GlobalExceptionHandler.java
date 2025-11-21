@@ -2,6 +2,7 @@ package com.hansung.leafly.global.exception;
 
 import com.hansung.leafly.global.response.ErrorResponse;
 import com.hansung.leafly.global.response.code.ErrorResponseCode;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -100,6 +101,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse<?>> handleBaseException(BaseException e){
         log.error("BaseException : {}", e.getBaseResponseCode().getMessage(), e);
         ErrorResponse<?> errorResponse = ErrorResponse.from(e.getBaseResponseCode());
+        return ResponseEntity.status(errorResponse.getHttpStatus()).body(errorResponse);
+    }
+
+    // RequestParam, PathVariable 등 검증(@Validated) 실패 시 발생
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse<?>> handleConstraintViolationException(ConstraintViolationException e) {
+        log.error("ConstraintViolationException : {}", e.getMessage(), e);
+
+        // 여러 위반 중 첫 번째 메시지 선택
+        String message = e.getConstraintViolations().stream()
+                .findFirst()
+                .map(v -> v.getMessage())
+                .orElse("유효하지 않은 요청 파라미터입니다.");
+
+        ErrorResponse<?> errorResponse = ErrorResponse.of(
+                ErrorResponseCode.INVALID_HTTP_MESSAGE_PARAMETER,
+                message
+        );
         return ResponseEntity.status(errorResponse.getHttpStatus()).body(errorResponse);
     }
 
