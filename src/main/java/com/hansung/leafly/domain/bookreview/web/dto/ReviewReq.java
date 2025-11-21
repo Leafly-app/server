@@ -26,7 +26,7 @@ public class ReviewReq {
     private Integer rating;
 
     @NotNull(message = "책의 카테고리를 입력해주세요.")
-    private String tags;
+    private String category;
 
     @Size(max = 20, message = "리뷰 제목은 최대 20자까지 입력 가능합니다.")
     private String reviewTitle;

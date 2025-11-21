@@ -34,7 +34,7 @@ public class BookReviewServiceImpl implements BookReviewService {
         BookReview bookReview = BookReview.toEntity(member, req);
         bookReviewRepository.save(bookReview);
 
-        List<BookTag> tags = processTags(req.getTags(), bookReview);
+        List<BookTag> tags = processTags(req.getCategory(), bookReview);
         bookTagRepository.saveAll(tags);
 
         List<ReviewImage> images = processImages(req.getImages(), bookReview);
