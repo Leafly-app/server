@@ -4,6 +4,7 @@ import com.hansung.leafly.domain.member.entity.enums.Gender;
 import com.hansung.leafly.domain.member.entity.Genre;
 import com.hansung.leafly.domain.member.entity.enums.ReadingFrequency;
 import com.hansung.leafly.domain.member.entity.enums.ReadingPurpose;
+import com.hansung.leafly.domain.member.web.dto.OnboardingReq;
 import com.hansung.leafly.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,6 +48,16 @@ public class Onboarding extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;
+
+    public static Onboarding from(Member member, OnboardingReq req){
+        return Onboarding.builder()
+                .member(member)
+                .birthYear(req.getBirthYear())
+                .gender(req.getGender())
+                .readingPurpose(req.getReadingPurpose())
+                .readingFrequency(req.getReadingFrequency())
+                .build();
+    }
 
     public void addGenre(Genre genre) {
         OnboardingGenre join = OnboardingGenre.builder()

@@ -7,14 +7,10 @@ import com.hansung.leafly.domain.member.entity.enums.GenreType;
 import com.hansung.leafly.domain.member.exception.AlreadyOnboardedException;
 import com.hansung.leafly.domain.member.exception.InvalidCredentialsException;
 import com.hansung.leafly.domain.member.exception.MemberAlreadyExistException;
-import com.hansung.leafly.domain.member.exception.MemberErrorCode;
 import com.hansung.leafly.domain.member.repository.GenreRepository;
 import com.hansung.leafly.domain.member.repository.MemberRepository;
 import com.hansung.leafly.domain.member.repository.OnboardingRepository;
-import com.hansung.leafly.domain.member.web.dto.LoginReq;
-import com.hansung.leafly.domain.member.web.dto.LoginRes;
-import com.hansung.leafly.domain.member.web.dto.OnboardingReq;
-import com.hansung.leafly.domain.member.web.dto.SignUpReq;
+import com.hansung.leafly.domain.member.web.dto.*;
 import com.hansung.leafly.global.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,13 +67,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // 기본 온보딩 정보 생성
-        Onboarding onboarding = Onboarding.builder()
-                .member(member)
-                .birthYear(req.getBirthYear())
-                .gender(req.getGender())
-                .readingPurpose(req.getReadingPurpose())
-                .readingFrequency(req.getReadingFrequency())
-                .build();
+        Onboarding onboarding = Onboarding.from(member, req);
 
         // 선택된 장르 조회
         List<GenreType> selectedTypes = req.getFavoriteGenres();
@@ -88,7 +78,6 @@ public class MemberServiceImpl implements MemberService {
             onboarding.addGenre(genre);
         }
 
-        // 저장
         onboardingRepository.save(onboarding);
     }
 }
