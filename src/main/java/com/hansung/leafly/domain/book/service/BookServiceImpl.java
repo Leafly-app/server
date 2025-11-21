@@ -1,8 +1,7 @@
 package com.hansung.leafly.domain.book.service;
 
-import com.hansung.leafly.domain.book.web.dto.AladinSearchResponse;
-import com.hansung.leafly.domain.book.web.dto.BookRes;
-import com.hansung.leafly.domain.book.web.dto.SearchRes;
+import com.hansung.leafly.domain.book.entity.enums.BookGenre;
+import com.hansung.leafly.domain.book.web.dto.*;
 import com.hansung.leafly.infra.aladin.AladinClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,20 +16,45 @@ import java.util.List;
 public class BookServiceImpl implements BookService {
     private final AladinClient aladinClient;
 
-    // 제목 검색
+    // 검색
     @Override
-    public List<SearchRes> search(String keyword) {
+    public List<SearchRes> search(String keyword, BookFilterReq req) {
         AladinSearchResponse response = aladinClient.search(keyword);
 
         if (response == null || response.item() == null) {
             return List.of();
         }
 
+        if (req == null || req.getGenres() == null || req.getGenres().isEmpty()) {
+            return response.item().stream()
+                    .map(item -> SearchRes.from(item, false))
+                    .toList();
+        }
+
+        List<BookGenre> filters = req.getGenres();
+
         return response.item().stream()
-                .map(item -> SearchRes.from(
-                        item,
-                        false       //좋아요 기능 구현 후 수정 필요
-                ))
+                .filter(item -> matchesGenre(item, filters))
+                .map(item -> SearchRes.from(item, false))
                 .toList();
+    }
+
+    //카테고리 필터링
+    private boolean matchesGenre(AladinBookItem item, List<BookGenre> targetGenres) {
+        String middle = extractMiddleCategory(item.categoryName());
+
+        for (BookGenre genre : targetGenres) {
+            if (middle.contains(genre.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //카테고리 추출 메소드
+    private String extractMiddleCategory(String categoryName) {
+        if (categoryName == null) return "";
+        String[] tokens = categoryName.split(">");
+        return tokens.length >= 2 ? tokens[1].trim() : "";
     }
 }
