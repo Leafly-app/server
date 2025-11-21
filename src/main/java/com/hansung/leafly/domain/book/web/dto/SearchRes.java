@@ -5,6 +5,7 @@ public record SearchRes (
         String title,
         String author,
         String cover,
+        String category,
         double rating,
         boolean isLiked
 ){
@@ -14,6 +15,7 @@ public record SearchRes (
                 item.title(),
                 item.author(),
                 item.cover(),
+                item.categoryName(),
                 item.customerReviewRank(),
                 isLiked
         );
