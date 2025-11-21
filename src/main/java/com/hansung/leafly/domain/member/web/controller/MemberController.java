@@ -1,11 +1,8 @@
 package com.hansung.leafly.domain.member.web.controller;
 
-import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.domain.member.service.MemberService;
-import com.hansung.leafly.domain.member.web.dto.LoginReq;
-import com.hansung.leafly.domain.member.web.dto.LoginRes;
-import com.hansung.leafly.domain.member.web.dto.OnboardingReq;
-import com.hansung.leafly.domain.member.web.dto.SignUpReq;
+import com.hansung.leafly.domain.member.web.dto.*;
+import com.hansung.leafly.domain.recommend.web.dto.RecommendRes;
 import com.hansung.leafly.global.auth.security.CustomMemberDetails;
 import com.hansung.leafly.global.response.SuccessResponse;
 import jakarta.validation.Valid;
@@ -14,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/members")
