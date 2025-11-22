@@ -3,6 +3,8 @@ package com.hansung.leafly.domain.bookreview.service;
 import com.hansung.leafly.domain.bookreview.entity.BookReview;
 import com.hansung.leafly.domain.bookreview.entity.BookTag;
 import com.hansung.leafly.domain.bookreview.entity.ReviewImage;
+import com.hansung.leafly.domain.bookreview.exception.BookReviewAccessDeniedException;
+import com.hansung.leafly.domain.bookreview.exception.BookReviewNotFoundException;
 import com.hansung.leafly.domain.bookreview.repository.BookReviewRepository;
 import com.hansung.leafly.domain.bookreview.repository.BookTagRepository;
 import com.hansung.leafly.domain.bookreview.repository.ReviewImageRepository;
@@ -39,6 +41,19 @@ public class BookReviewServiceImpl implements BookReviewService {
 
         List<ReviewImage> images = processImages(req.getImages(), bookReview);
         reviewImageRepository.saveAll(images);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long reviewId, Member member) {
+        BookReview bookReview = bookReviewRepository.findById(reviewId)
+                .orElseThrow(()-> new BookReviewNotFoundException());
+
+        if(!bookReview.getMember().getId().equals(member.getId())) {
+            throw new BookReviewAccessDeniedException();
+        }
+
+        bookReviewRepository.delete(bookReview);
     }
 
     // 카테고리 태그화
