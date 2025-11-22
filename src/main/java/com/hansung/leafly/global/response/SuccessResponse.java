@@ -37,7 +37,7 @@ public class SuccessResponse<T> extends BaseResponse {
         return new SuccessResponse<>(data, baseResponseCode);
     }
 
-    public static SuccessResponse<?> from(BaseResponseCode baseResponseCode){
+    public static SuccessResponse<?> fromCode(BaseResponseCode baseResponseCode){
         return new SuccessResponse<>(null, baseResponseCode);
     }
 }
