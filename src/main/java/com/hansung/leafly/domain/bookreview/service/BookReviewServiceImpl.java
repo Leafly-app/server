@@ -8,7 +8,9 @@ import com.hansung.leafly.domain.bookreview.exception.BookReviewNotFoundExceptio
 import com.hansung.leafly.domain.bookreview.repository.BookReviewRepository;
 import com.hansung.leafly.domain.bookreview.repository.BookTagRepository;
 import com.hansung.leafly.domain.bookreview.repository.ReviewImageRepository;
+import com.hansung.leafly.domain.bookreview.web.dto.ReviewListRes;
 import com.hansung.leafly.domain.bookreview.web.dto.ReviewReq;
+import com.hansung.leafly.domain.bookreview.web.dto.ReviewRes;
 import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.infra.s3.S3Service;
 import com.hansung.leafly.infra.s3.exception.S3RequestFailedException;
@@ -54,6 +56,17 @@ public class BookReviewServiceImpl implements BookReviewService {
         }
 
         bookReviewRepository.delete(bookReview);
+    }
+
+    @Override
+    public ReviewListRes getList(Member member) {
+        List<BookReview> reviews = bookReviewRepository.findAllByMember(member);
+
+        List<ReviewRes> reviewResList = reviews.stream()
+                .map(ReviewRes::from)
+                .toList();
+
+        return new ReviewListRes(reviewResList.size(), reviewResList);
     }
 
     // 카테고리 태그화

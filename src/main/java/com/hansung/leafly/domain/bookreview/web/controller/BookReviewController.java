@@ -2,6 +2,7 @@ package com.hansung.leafly.domain.bookreview.web.controller;
 
 import com.amazonaws.Response;
 import com.hansung.leafly.domain.bookreview.service.BookReviewService;
+import com.hansung.leafly.domain.bookreview.web.dto.ReviewListRes;
 import com.hansung.leafly.domain.bookreview.web.dto.ReviewReq;
 import com.hansung.leafly.global.auth.security.CustomMemberDetails;
 import com.hansung.leafly.global.response.SuccessResponse;
@@ -36,5 +37,14 @@ public class BookReviewController {
     ){
         bookReviewService.delete(reviewId,memberDetails.getMember());
         return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(null));
+    }
+
+    //독후감 리스트 반환
+    @GetMapping
+    public ResponseEntity<SuccessResponse<ReviewListRes>> getList(
+            @AuthenticationPrincipal CustomMemberDetails memberDetails
+    ){
+        ReviewListRes res = bookReviewService.getList(memberDetails.getMember());
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
     }
 }
