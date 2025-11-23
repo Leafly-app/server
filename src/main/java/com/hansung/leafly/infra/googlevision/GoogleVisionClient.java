@@ -56,7 +56,6 @@ public class GoogleVisionClient {
 
             HttpEntity<?> entity = new HttpEntity<>(requestBody, headers);
 
-            // Vision API 호출 URL
             String url = endpoint + "?key=" + apiKey;
 
             String response = restTemplate.postForObject(url, entity, String.class);
@@ -72,7 +71,7 @@ public class GoogleVisionClient {
             return textNode.asText();
 
         } catch (Exception e) {
-            log.error("Google Vision API 호출 실패: {}", e.getMessage(), e);  // <-- 핵심
+            log.error("Google Vision API 호출 실패: {}", e.getMessage(), e);
             throw new GoogleVisionRequestFailedException();
         }
     }
