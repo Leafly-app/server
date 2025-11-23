@@ -2,6 +2,7 @@ package com.hansung.leafly.domain.book.web.controller;
 
 import com.hansung.leafly.domain.book.service.BookService;
 import com.hansung.leafly.domain.book.web.dto.BookFilterReq;
+import com.hansung.leafly.domain.book.web.dto.BookInfoRes;
 import com.hansung.leafly.domain.book.web.dto.SearchRes;
 import com.hansung.leafly.global.response.SuccessResponse;
 import jakarta.validation.Valid;
@@ -30,4 +31,13 @@ public class BookController {
         List<SearchRes> res = bookService.search(keyword, req);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
     }
+
+    @GetMapping("/{isbn}")
+    public ResponseEntity<SuccessResponse<BookInfoRes>> details(
+        @PathVariable Long isbn
+    ){
+        BookInfoRes res = bookService.details(isbn);
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
+    }
+
 }
