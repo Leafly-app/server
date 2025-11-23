@@ -1,6 +1,6 @@
 package com.hansung.leafly.domain.recommend.service;
 
-import com.hansung.leafly.domain.book.web.dto.AladinSearchResponse;
+import com.hansung.leafly.domain.book.web.dto.AladinSearchRes;
 import com.hansung.leafly.domain.book.web.dto.SearchRes;
 import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.domain.member.entity.Onboarding;
@@ -41,7 +41,7 @@ public class RecommendServiceImpl implements RecommendService {
 
         //실제 존재하는 책 필터링
         for (var book : aiRes.books()) {
-            AladinSearchResponse searchRes = aladinClient.search(book.title());
+            AladinSearchRes searchRes = aladinClient.search(book.title());
 
             if (searchRes == null || searchRes.item() == null || searchRes.item().isEmpty()) {
                 continue;

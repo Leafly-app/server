@@ -1,7 +1,8 @@
 package com.hansung.leafly.infra.aladin;
 
-import com.hansung.leafly.domain.book.web.dto.AladinSearchResponse;
-import com.hansung.leafly.domain.book.web.dto.BookRes;
+import com.hansung.leafly.domain.book.web.dto.AladinSearchRes;
+import com.hansung.leafly.domain.book.web.dto.RecommendRes;
+import com.hansung.leafly.infra.aladin.dto.BookRes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -35,7 +36,7 @@ public class AladinClient {
         return restTemplate.getForObject(uri, BookRes.class);
     }
 
-    public AladinSearchResponse search(String keyword) {
+    public AladinSearchRes search(String keyword) {
         String uri = UriComponentsBuilder.fromHttpUrl(SEARCH_URL)
                 .queryParam("ttbkey", TTB_KEY)
                 .queryParam("Query", keyword)
@@ -47,7 +48,23 @@ public class AladinClient {
                 .build()
                 .toUriString();
 
-        return restTemplate.getForObject(uri, AladinSearchResponse.class);
+        return restTemplate.getForObject(uri, AladinSearchRes.class);
+    }
+
+    public AladinSearchRes searchByCategory(String categoryId) {
+        String uri = UriComponentsBuilder.fromHttpUrl(SEARCH_URL)
+                .queryParam("ttbkey", TTB_KEY)
+                .queryParam("Query", "*")   // 전체 검색
+                .queryParam("QueryType", "Keyword")
+                .queryParam("SearchTarget", "Book")
+                .queryParam("CategoryId", categoryId)
+                .queryParam("MaxResults", 6)
+                .queryParam("output", "js")
+                .queryParam("Version", "20131101")
+                .build()
+                .toUriString();
+
+        return restTemplate.getForObject(uri, AladinSearchRes.class);
     }
 }
 
