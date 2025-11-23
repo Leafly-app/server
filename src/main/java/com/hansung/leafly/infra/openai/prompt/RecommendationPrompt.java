@@ -61,7 +61,6 @@ public class RecommendationPrompt {
         - 저자: %s
         - 출판사: %s
         - 출판일: %s
-        - 카테고리: %s
         - 책 설명: %s
 
         [요약 작성 기준]
@@ -91,7 +90,6 @@ public class RecommendationPrompt {
                 book.author(),
                 book.publisher(),
                 book.pubDate(),
-                book.categoryName(),
                 book.description()
         );
     }

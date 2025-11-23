@@ -1,6 +1,7 @@
 package com.hansung.leafly.domain.book.service;
 
 import com.hansung.leafly.domain.book.entity.enums.BookGenre;
+import com.hansung.leafly.domain.book.exception.BookNotFoundException;
 import com.hansung.leafly.domain.book.web.dto.*;
 import com.hansung.leafly.infra.aladin.AladinClient;
 import com.hansung.leafly.infra.aladin.dto.BookRes;
@@ -8,6 +9,7 @@ import com.hansung.leafly.infra.openai.OpenAiClient;
 import com.hansung.leafly.infra.openai.dto.BookSummaryAiRes;
 import com.hansung.leafly.infra.openai.prompt.RecommendationPrompt;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,26 +47,32 @@ public class BookServiceImpl implements BookService {
     public BookInfoRes details(Long isbn) {
         // ISBN 기반 상세 정보 조회
         BookRes bookRes = aladinClient.fetchBookByIsbn(String.valueOf(isbn));
-        IsbnSearchRes searchRes = IsbnSearchRes.from(bookRes);
-        BookDetailRes detail = BookDetailRes.from(searchRes);
+        if (bookRes == null ||
+                bookRes.getItems() == null ||
+                bookRes.getItems().isEmpty() ||
+                bookRes.getItems().get(0) == null) {
+            throw new BookNotFoundException();
+        }
+
+        BookDetailRes detail = BookDetailRes.from(bookRes);
 
         // BookSummaryPrompt 생성 → AI 요약 + 태그 생성
         String prompt = RecommendationPrompt.build(detail);
         BookSummaryAiRes summaryAi = openAiClient.summarizeBook(prompt);
 
-        // categoryName에서 categoryId 추출
-        String categoryId = extractCategoryId(detail.categoryName());
-
         // 해당 카테고리 기반 추천 목록 검색
+        String categoryId = String.valueOf(bookRes.getItems().get(0).getCategoryId());
         AladinSearchRes categorySearchRes = aladinClient.searchByCategory(categoryId);
         List<RecommendRes> recommendations = toRecommendationList(categorySearchRes);
 
-        // 최종 Res 조립
+        //boolean liked = likeService.isBookLiked(memberId, isbn13);
+
         return BookInfoRes.of(
                 detail,
                 summaryAi.summary(),
                 summaryAi.tags(),
-                recommendations
+                recommendations,
+                false
         );
     }
 
@@ -85,18 +93,6 @@ public class BookServiceImpl implements BookService {
         if (categoryName == null) return "";
         String[] tokens = categoryName.split(">");
         return tokens.length >= 2 ? tokens[1].trim() : "";
-    }
-
-    //카테고리 번호 추출 메소드
-    private String extractCategoryId(String categoryName) {
-        if (categoryName == null) return null;
-
-        int start = categoryName.indexOf("[");
-        int end = categoryName.indexOf("]");
-
-        if (start == -1 || end == -1) return null;
-
-        return categoryName.substring(start + 1, end);
     }
 
     private List<RecommendRes> toRecommendationList(AladinSearchRes res) {
