@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,6 +39,14 @@ public class BookController {
     ){
         BookInfoRes res = bookService.details(isbn);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
+    }
+
+    @PostMapping("/ocr")
+    public ResponseEntity<SuccessResponse<BookInfoRes>> ocr(
+            @RequestParam("file") MultipartFile file
+    ){
+        BookInfoRes res = bookService.ocr(file);
+        return  ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
     }
 
 }
