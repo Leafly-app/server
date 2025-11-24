@@ -1,9 +1,15 @@
 package com.hansung.leafly.domain.member.entity;
 
+import com.hansung.leafly.domain.bookmark.entity.Bookmark;
+import com.hansung.leafly.domain.bookreview.entity.ReviewImage;
+import com.hansung.leafly.domain.library.entity.Library;
 import com.hansung.leafly.domain.member.entity.enums.MemberRole;
 import com.hansung.leafly.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +36,12 @@ public class Member extends BaseEntity {
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Onboarding onboarding;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Library> libraries = new ArrayList<>();
 
     public static Member toEntity(String email, String encoded, String nickName){
         return Member.builder()
