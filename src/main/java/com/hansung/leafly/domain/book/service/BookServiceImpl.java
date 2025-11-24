@@ -100,7 +100,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookInfoRes ocr(MultipartFile file) {
+    public BookInfoRes ocr(MultipartFile file, Member member) {
         if (file == null || file.isEmpty()) {
             throw new FileEmptyException();
         }
@@ -109,7 +109,7 @@ public class BookServiceImpl implements BookService {
         Long isbn = extractIsbn(ocrText);
         log.info("[OCR] 추출된 ISBN: {}", isbn);
 
-        return details(isbn);
+        return details(isbn, member);
     }
 
     //카테고리 필터링

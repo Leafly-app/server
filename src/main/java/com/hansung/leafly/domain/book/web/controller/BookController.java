@@ -47,9 +47,10 @@ public class BookController {
 
     @PostMapping("/ocr")
     public ResponseEntity<SuccessResponse<BookInfoRes>> ocr(
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal CustomMemberDetails memberDetails
     ){
-        BookInfoRes res = bookService.ocr(file);
+        BookInfoRes res = bookService.ocr(file,memberDetails.getMember());
         return  ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
     }
 

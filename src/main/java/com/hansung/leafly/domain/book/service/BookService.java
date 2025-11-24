@@ -13,5 +13,5 @@ public interface BookService {
 
     BookInfoRes details(Long isbn, Member member);
 
-    BookInfoRes ocr(MultipartFile file);
+    BookInfoRes ocr(MultipartFile file, Member member);
 }
