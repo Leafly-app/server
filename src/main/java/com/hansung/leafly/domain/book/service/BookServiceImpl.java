@@ -3,6 +3,8 @@ package com.hansung.leafly.domain.book.service;
 import com.hansung.leafly.domain.book.entity.enums.BookGenre;
 import com.hansung.leafly.domain.book.exception.BookNotFoundException;
 import com.hansung.leafly.domain.book.web.dto.*;
+import com.hansung.leafly.domain.bookmark.repository.BookmarkRepository;
+import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.infra.aladin.AladinClient;
 import com.hansung.leafly.infra.aladin.dto.BookRes;
 import com.hansung.leafly.infra.openai.OpenAiClient;
@@ -12,26 +14,37 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final AladinClient aladinClient;
     private final OpenAiClient openAiClient;
+    private final BookmarkRepository bookmarkRepository;
 
     // 검색
     @Override
-    public List<SearchRes> search(String keyword, BookFilterReq req) {
+    public List<SearchRes> search(String keyword, BookFilterReq req,  Member member) {
         AladinSearchRes response = aladinClient.search(keyword);
 
         if (response == null || response.item() == null) {
             return List.of();
         }
 
+        //️유저의 북마크된 ISBN 목록 조회
+        List<Long> bookmarkedIsbns = bookmarkRepository.findIsbnsByMemberId(member.getId());
+        Set<Long> bookmarkedSet = new HashSet<>(bookmarkedIsbns);
+
+
         if (req == null || req.getGenres() == null || req.getGenres().isEmpty()) {
             return response.item().stream()
-                    .map(item -> SearchRes.from(item, false))
+                    .map(item -> SearchRes.from(
+                            item,
+                            bookmarkedSet.contains(Long.parseLong(item.isbn13()))
+                    ))
                     .toList();
         }
 
@@ -39,12 +52,15 @@ public class BookServiceImpl implements BookService {
 
         return response.item().stream()
                 .filter(item -> matchesGenre(item, filters))
-                .map(item -> SearchRes.from(item, false))
+                .map(item -> SearchRes.from(
+                        item,
+                        bookmarkedSet.contains(Long.parseLong(item.isbn13()))       // 북마크 여부 체크
+                ))
                 .toList();
     }
 
     @Override
-    public BookInfoRes details(Long isbn) {
+    public BookInfoRes details(Long isbn, Member member) {
         // ISBN 기반 상세 정보 조회
         BookRes bookRes = aladinClient.fetchBookByIsbn(String.valueOf(isbn));
         if (bookRes == null ||
@@ -65,14 +81,14 @@ public class BookServiceImpl implements BookService {
         AladinSearchRes categorySearchRes = aladinClient.searchByCategory(categoryId);
         List<RecommendRes> recommendations = toRecommendationList(categorySearchRes);
 
-        //boolean liked = likeService.isBookLiked(memberId, isbn13);
+        boolean isLiked = bookmarkRepository.existsByMember_IdAndIsbn(member.getId(), isbn);
 
         return BookInfoRes.of(
                 detail,
                 summaryAi.summary(),
                 summaryAi.tags(),
                 recommendations,
-                false
+                isLiked
         );
     }
 
