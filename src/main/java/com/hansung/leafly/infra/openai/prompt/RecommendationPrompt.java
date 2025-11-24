@@ -18,7 +18,7 @@ public class RecommendationPrompt {
                 
         3. **각 도서에는 다음 두 필드만 포함**
         - title: 책 제목 (한국어 제목)
-        - reason: 그 책이 왜 이 사용자에게 적합한지 한 줄 설명
+        - reason: 그 책이 왜 이 사용자에게 적합한지 한국어로 **정확히 10~15자 범위 내**로만 작성
 
         [사용자 온보딩 정보]
         - 성별: %s
@@ -32,7 +32,7 @@ public class RecommendationPrompt {
           "books": [
             {
               "title": "책 제목",
-              "reason": "이 사용자가 왜 이 책을 좋아할지에 대한 간단한 추천 이유"
+              "reason": "이 사용자가 왜 이 책을 좋아할지에 대한 간단한 추천 이유 (10~15자 내외)"
             }
           ]
         }
