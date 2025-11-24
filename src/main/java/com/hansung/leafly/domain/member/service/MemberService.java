@@ -10,4 +10,6 @@ public interface MemberService {
     LoginRes login(LoginReq loginReq);
 
     void onboarding(Member member, OnboardingReq req);
+
+    MemberDetailsRes details(Member member);
 }

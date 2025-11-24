@@ -45,4 +45,13 @@ public class MemberController {
         memberService.onboarding(memberDetails.getMember(), req);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created(null));
     }
+
+    //회원 정보 반환
+    @GetMapping
+    public ResponseEntity<SuccessResponse<MemberDetailsRes>> details(
+            @AuthenticationPrincipal CustomMemberDetails memberDetails
+    ){
+        MemberDetailsRes res = memberService.details(memberDetails.getMember());
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
+    }
 }
