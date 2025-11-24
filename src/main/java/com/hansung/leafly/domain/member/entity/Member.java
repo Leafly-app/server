@@ -9,7 +9,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,6 +33,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false, name = "nick_name")
     private String nickName;
 
+    private String image;
+
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
@@ -38,10 +42,10 @@ public class Member extends BaseEntity {
     private Onboarding onboarding;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bookmark> bookmarks = new ArrayList<>();
+    private Set<Bookmark> bookmarks = new HashSet<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Library> libraries = new ArrayList<>();
+    private Set<Library> libraries = new HashSet<>();
 
     public static Member toEntity(String email, String encoded, String nickName){
         return Member.builder()
