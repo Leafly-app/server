@@ -21,10 +21,11 @@ public class BookmarkController {
     @PostMapping("/{isbn}")
     public ResponseEntity<SuccessResponse<BookmarkToggleRes>> toggleBookmark(
             @AuthenticationPrincipal CustomMemberDetails memberDetails,
-            @PathVariable Long isbn,
+            @PathVariable String isbn,
             @RequestBody(required = false) @Valid BookmarkReq req
     ) {
-        boolean isOn = bookmarkService.toggle(memberDetails.getMember(), isbn, req);
+        Long isbnLong = Long.valueOf(isbn);
+        boolean isOn = bookmarkService.toggle(memberDetails.getMember(), isbnLong, req);
         BookmarkToggleRes res = new BookmarkToggleRes(isOn ? "on" : "off");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessResponse.created(res));
