@@ -2,28 +2,35 @@ package com.hansung.leafly.domain.book.service;
 
 import com.hansung.leafly.domain.book.entity.enums.BookGenre;
 import com.hansung.leafly.domain.book.exception.BookNotFoundException;
+import com.hansung.leafly.domain.book.exception.FileEmptyException;
 import com.hansung.leafly.domain.book.web.dto.*;
 import com.hansung.leafly.domain.bookmark.repository.BookmarkRepository;
 import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.infra.aladin.AladinClient;
 import com.hansung.leafly.infra.aladin.dto.BookRes;
+import com.hansung.leafly.infra.googlevision.GoogleVisionClient;
 import com.hansung.leafly.infra.openai.OpenAiClient;
 import com.hansung.leafly.infra.openai.dto.BookSummaryAiRes;
 import com.hansung.leafly.infra.openai.prompt.RecommendationPrompt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookServiceImpl implements BookService {
     private final AladinClient aladinClient;
     private final OpenAiClient openAiClient;
     private final BookmarkRepository bookmarkRepository;
+    private final GoogleVisionClient googleVisionClient;
 
     // 검색
     @Override
@@ -92,6 +99,19 @@ public class BookServiceImpl implements BookService {
         );
     }
 
+    @Override
+    public BookInfoRes ocr(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new FileEmptyException();
+        }
+        String ocrText = googleVisionClient.detectText(file);
+        log.info("[OCR] Vision API 추출 텍스트:\n{}", ocrText);
+        Long isbn = extractIsbn(ocrText);
+        log.info("[OCR] 추출된 ISBN: {}", isbn);
+
+        return details(isbn);
+    }
+
     //카테고리 필터링
     private boolean matchesGenre(AladinBookItem item, List<BookGenre> targetGenres) {
         String middle = extractMiddleCategory(item.categoryName());
@@ -120,5 +140,21 @@ public class BookServiceImpl implements BookService {
                         item.cover()
                 ))
                 .toList();
+    }
+
+    private Long extractIsbn(String ocrText) {
+        Pattern pattern = Pattern.compile("ISBN\\s*97[89][0-9\\-]{10,}");
+        Matcher matcher = pattern.matcher(ocrText);
+
+        if (matcher.find()) {
+            String raw = matcher.group();
+            String isbn = raw.replaceAll("[^0-9]", "");
+
+            if (isbn.length() == 13) {
+                return Long.parseLong(isbn);
+            }
+        }
+
+        return null;
     }
 }
