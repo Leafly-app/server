@@ -2,5 +2,6 @@ package com.hansung.leafly.domain.member.web.dto.info;
 
 public record BookSimple(
         String isbn,
-        String coverUrl
+        String coverUrl,
+        String title
 ) {}
