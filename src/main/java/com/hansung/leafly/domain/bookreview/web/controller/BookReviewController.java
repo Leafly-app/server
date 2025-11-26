@@ -5,6 +5,7 @@ import com.hansung.leafly.domain.bookreview.service.BookReviewService;
 import com.hansung.leafly.domain.bookreview.web.dto.ReviewDetailsRes;
 import com.hansung.leafly.domain.bookreview.web.dto.ReviewListRes;
 import com.hansung.leafly.domain.bookreview.web.dto.ReviewReq;
+import com.hansung.leafly.domain.bookreview.web.dto.ReviewUpdateReq;
 import com.hansung.leafly.global.auth.security.CustomMemberDetails;
 import com.hansung.leafly.global.response.SuccessResponse;
 import jakarta.validation.Valid;
@@ -57,5 +58,16 @@ public class BookReviewController {
     ){
         ReviewDetailsRes res = bookReviewService.getDetails(reviewId,memberDetails.getMember());
         return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
+    }
+
+    //독후감 수정
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<SuccessResponse<?>> update(
+          @AuthenticationPrincipal CustomMemberDetails memberDetails,
+          @PathVariable Long reviewId,
+          @ModelAttribute @Valid ReviewUpdateReq req
+    ){
+        bookReviewService.update(memberDetails.getMember(), reviewId, req);
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(null));
     }
 }
