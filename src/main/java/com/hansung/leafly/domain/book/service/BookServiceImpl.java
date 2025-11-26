@@ -58,10 +58,10 @@ public class BookServiceImpl implements BookService {
         List<BookGenre> filters = req.getGenres();
 
         return response.item().stream()
-                .filter(item -> matchesGenre(item, filters))
+                .filter(item -> item.isbn13() != null && !item.isbn13().isBlank()) // ISBN 없는 책 제외
                 .map(item -> SearchRes.from(
                         item,
-                        bookmarkedSet.contains(Long.parseLong(item.isbn13()))       // 북마크 여부 체크
+                        bookmarkedSet.contains(Long.parseLong(item.isbn13()))
                 ))
                 .toList();
     }
