@@ -8,10 +8,7 @@ import com.hansung.leafly.domain.bookreview.exception.BookReviewNotFoundExceptio
 import com.hansung.leafly.domain.bookreview.repository.BookReviewRepository;
 import com.hansung.leafly.domain.bookreview.repository.BookTagRepository;
 import com.hansung.leafly.domain.bookreview.repository.ReviewImageRepository;
-import com.hansung.leafly.domain.bookreview.web.dto.ReviewDetailsRes;
-import com.hansung.leafly.domain.bookreview.web.dto.ReviewListRes;
-import com.hansung.leafly.domain.bookreview.web.dto.ReviewReq;
-import com.hansung.leafly.domain.bookreview.web.dto.ReviewRes;
+import com.hansung.leafly.domain.bookreview.web.dto.*;
 import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.infra.s3.S3Service;
 import com.hansung.leafly.infra.s3.exception.S3RequestFailedException;
@@ -80,6 +77,27 @@ public class BookReviewServiceImpl implements BookReviewService {
         }
 
         return ReviewDetailsRes.from(review);
+    }
+
+    @Override
+    @Transactional
+    public void update(Member member, Long reviewId, ReviewUpdateReq req) {
+        BookReview review = bookReviewRepository.findById(reviewId)
+                .orElseThrow(BookReviewNotFoundException::new);
+
+        if (!review.getMember().getId().equals(member.getId())) {
+            throw new BookReviewAccessDeniedException();
+        }
+        review.update(req);
+
+        // 이미지 수정이 요청된 경우에만 처리
+        if (req.getImages() != null && !req.getImages().isEmpty()) {
+            List<ReviewImage> newImages = processImages(req.getImages(), review);
+            //기존 이미지 제거 & 새로 교체
+            review.replaceImages(newImages);
+        }
+
+        bookReviewRepository.save(review);
     }
 
     // 카테고리 태그화
