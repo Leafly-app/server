@@ -103,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
         // 서재: 완독 책
         List<BookSimple> finishedBooks = libraries.stream()
                 .filter(lib -> lib.getStatus() == LibraryStatus.DONE)
-                .map(lib -> new BookSimple(lib.getIsbn(), lib.getCover()))
+                .map(lib -> new BookSimple(lib.getIsbn(), lib.getCover(), lib.getTitle()))
                 .toList();
 
         int finishedCount = finishedBooks.size();
@@ -111,14 +111,14 @@ public class MemberServiceImpl implements MemberService {
         // 서재: 읽고 싶음 책
         List<BookSimple> wantBooks = libraries.stream()
                 .filter(lib -> lib.getStatus() == LibraryStatus.WANT_TO_READ)
-                .map(lib -> new BookSimple(lib.getIsbn(), lib.getCover()))
+                .map(lib -> new BookSimple(lib.getIsbn(), lib.getCover(), lib.getTitle()))
                 .toList();
 
         int wantCount = wantBooks.size();
 
         // 좋아요 LIST
         List<BookSimple> likeBooks = bookmarks.stream()
-                .map(bm -> new BookSimple(String.valueOf(bm.getIsbn()), bm.getCover()))
+                .map(bm -> new BookSimple(String.valueOf(bm.getIsbn()), bm.getCover(),  bm.getTitle()))
                 .toList();
 
         int likeCount = likeBooks.size();
