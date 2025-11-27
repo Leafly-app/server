@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hansung.leafly.infra.openai.dto.BookSummaryAiRes;
 import com.hansung.leafly.infra.openai.dto.RecommendAiRes;
 import com.hansung.leafly.infra.openai.exception.OpenaiRequestFailed;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class OpenAiClient {
 
     @Value("${openai.api.key}")
@@ -62,6 +64,7 @@ public class OpenAiClient {
             return mapper.readValue(content, responseType);
 
         } catch (Exception e) {
+            log.error("[OpenAI ERROR] Exception 메시지: {}", e.getMessage());
             throw new OpenaiRequestFailed();
         }
     }
