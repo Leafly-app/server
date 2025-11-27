@@ -37,7 +37,7 @@ public class BookReview extends BaseEntity {
     @Column(nullable =true, name = "review_title")
     private String reviewTitle;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
