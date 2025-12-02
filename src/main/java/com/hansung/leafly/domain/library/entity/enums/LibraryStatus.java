@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum LibraryStatus {
-    WANT_TO_READ("읽고 싶음"),
+    WANT_TO_READ("읽고 싶어요"),
     DONE("완독");
 
     private final String value;
