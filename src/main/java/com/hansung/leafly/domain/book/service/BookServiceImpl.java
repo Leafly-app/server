@@ -46,17 +46,6 @@ public class BookServiceImpl implements BookService {
         Set<Long> bookmarkedSet = new HashSet<>(bookmarkedIsbns);
 
 
-        if (req == null || req.getGenres() == null || req.getGenres().isEmpty()) {
-            return response.item().stream()
-                    .map(item -> SearchRes.from(
-                            item,
-                            bookmarkedSet.contains(Long.parseLong(item.isbn13()))
-                    ))
-                    .toList();
-        }
-
-        List<BookGenre> filters = req.getGenres();
-
         return response.item().stream()
                 .filter(item -> item.isbn13() != null && !item.isbn13().isBlank()) // ISBN 없는 책 제외
                 .map(item -> SearchRes.from(
