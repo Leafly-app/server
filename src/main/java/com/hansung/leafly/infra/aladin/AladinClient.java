@@ -20,6 +20,9 @@ public class AladinClient {
     @Value("${spring.aladin.key}")
     private String TTB_KEY;
 
+    @Value("${spring.aladin.bestseller.url}")
+    private String BEST_URL;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public BookRes fetchBookByIsbn(String isbn) {
@@ -68,11 +71,11 @@ public class AladinClient {
     }
 
     public AladinSearchRes bestSeller() {
-        String uri = UriComponentsBuilder.fromHttpUrl(SEARCH_URL)
+        String uri = UriComponentsBuilder.fromHttpUrl(BEST_URL)
                 .queryParam("ttbkey", TTB_KEY)
                 .queryParam("QueryType", "Bestseller")
                 .queryParam("SearchTarget", "Book")
-                .queryParam("MaxResults", 20)
+                .queryParam("MaxResults", 10)
                 .queryParam("output", "js")
                 .queryParam("Version", "20131101")
                 .build()
