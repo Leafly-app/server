@@ -1,5 +1,6 @@
 package com.hansung.leafly.domain.book.service;
 
+import com.hansung.leafly.domain.book.entity.enums.BookGenre;
 import com.hansung.leafly.domain.book.web.dto.BookFilterReq;
 import com.hansung.leafly.domain.book.web.dto.BookInfoRes;
 import com.hansung.leafly.domain.book.web.dto.SearchRes;
@@ -14,4 +15,6 @@ public interface BookService {
     BookInfoRes details(Long isbn, Member member);
 
     BookInfoRes ocr(MultipartFile file, Member member);
+
+    List<SearchRes> category(BookGenre genre, Member member);
 }
