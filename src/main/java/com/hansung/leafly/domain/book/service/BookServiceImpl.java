@@ -15,6 +15,7 @@ import com.hansung.leafly.infra.openai.prompt.RecommendationPrompt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class BookServiceImpl implements BookService {
     private final AladinClient aladinClient;
@@ -99,6 +101,35 @@ public class BookServiceImpl implements BookService {
         log.info("[OCR] 추출된 ISBN: {}", isbn);
 
         return details(isbn, member);
+    }
+
+    @Override
+    public List<SearchRes> category(BookGenre genre, Member member) {
+        AladinSearchRes response;
+
+        if (genre == BookGenre.ALL) {
+            // 전체 → 인기 도서 탐색
+            response = aladinClient.bestSeller();
+        } else {
+            // 장르 검색
+            response = aladinClient.searchByCategory(genre.getCategoryId());
+        }
+
+        if (response == null || response.item() == null) {
+            return List.of();
+        }
+
+        Set<Long> bookmarkedSet = new HashSet<>(
+                bookmarkRepository.findIsbnsByMemberId(member.getId())
+        );
+
+        return response.item().stream()
+                .filter(item -> item.isbn13() != null && !item.isbn13().isBlank())
+                .map(item -> SearchRes.from(
+                        item,
+                        bookmarkedSet.contains(Long.parseLong(item.isbn13()))
+                ))
+                .toList();
     }
 
     //카테고리 필터링

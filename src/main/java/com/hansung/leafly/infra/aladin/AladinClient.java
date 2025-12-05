@@ -66,5 +66,19 @@ public class AladinClient {
 
         return restTemplate.getForObject(uri, AladinSearchRes.class);
     }
+
+    public AladinSearchRes bestSeller() {
+        String uri = UriComponentsBuilder.fromHttpUrl(SEARCH_URL)
+                .queryParam("ttbkey", TTB_KEY)
+                .queryParam("QueryType", "Bestseller")
+                .queryParam("SearchTarget", "Book")
+                .queryParam("MaxResults", 20)
+                .queryParam("output", "js")
+                .queryParam("Version", "20131101")
+                .build()
+                .toUriString();
+
+        return restTemplate.getForObject(uri, AladinSearchRes.class);
+    }
 }
 

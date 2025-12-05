@@ -1,5 +1,6 @@
 package com.hansung.leafly.domain.book.web.controller;
 
+import com.hansung.leafly.domain.book.entity.enums.BookGenre;
 import com.hansung.leafly.domain.book.service.BookService;
 import com.hansung.leafly.domain.book.web.dto.BookFilterReq;
 import com.hansung.leafly.domain.book.web.dto.BookInfoRes;
@@ -54,4 +55,12 @@ public class BookController {
         return  ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
     }
 
+    @GetMapping("/category")
+    public ResponseEntity<SuccessResponse<List<SearchRes>>> category(
+        @RequestParam BookGenre genre,
+        @AuthenticationPrincipal CustomMemberDetails memberDetails
+    ){
+        List<SearchRes> res = bookService.category(genre, memberDetails.getMember());
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessResponse.from(res));
+    }
 }
