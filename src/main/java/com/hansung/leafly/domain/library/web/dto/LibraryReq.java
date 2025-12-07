@@ -4,8 +4,10 @@ import com.hansung.leafly.domain.library.entity.enums.LibraryStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class LibraryReq {
     @NotBlank(message = "책 제목이 비어 있습니다.")
     private String title;
