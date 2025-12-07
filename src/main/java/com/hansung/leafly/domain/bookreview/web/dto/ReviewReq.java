@@ -38,4 +38,7 @@ public class ReviewReq {
     // 이미지 최대 3개까지
     @Size(max = 3, message = "이미지는 최대 3장까지 업로드 가능합니다.")
     private List<MultipartFile> images;
+
+    @NotNull(message = "isbn을 입력해주세요.")
+    private String isbn;
 }

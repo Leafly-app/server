@@ -51,4 +51,8 @@ public class Library extends BaseEntity {
                 .status(req.getStatus())
                 .build();
     }
+
+    public void updateStatus(LibraryStatus status) {
+        this.status = status;
+    }
 }

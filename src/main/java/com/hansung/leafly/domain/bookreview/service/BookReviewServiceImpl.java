@@ -9,6 +9,11 @@ import com.hansung.leafly.domain.bookreview.repository.BookReviewRepository;
 import com.hansung.leafly.domain.bookreview.repository.BookTagRepository;
 import com.hansung.leafly.domain.bookreview.repository.ReviewImageRepository;
 import com.hansung.leafly.domain.bookreview.web.dto.*;
+import com.hansung.leafly.domain.library.entity.Library;
+import com.hansung.leafly.domain.library.entity.enums.LibraryStatus;
+import com.hansung.leafly.domain.library.repository.LibraryRepository;
+import com.hansung.leafly.domain.library.web.dto.LibraryReq;
+import com.hansung.leafly.domain.library.web.dto.LibraryReqBuilder;
 import com.hansung.leafly.domain.member.entity.Member;
 import com.hansung.leafly.infra.s3.S3Service;
 import com.hansung.leafly.infra.s3.exception.S3RequestFailedException;
@@ -20,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,6 +35,7 @@ public class BookReviewServiceImpl implements BookReviewService {
     private final BookTagRepository bookTagRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
+    private final LibraryRepository libraryRepository;
 
     @Override
     @Transactional
@@ -41,6 +48,8 @@ public class BookReviewServiceImpl implements BookReviewService {
 
         List<ReviewImage> images = processImages(req.getImages(), bookReview);
         reviewImageRepository.saveAll(images);
+
+        saveLibraryAsDone(member, req);
     }
 
     @Override
@@ -161,4 +170,21 @@ public class BookReviewServiceImpl implements BookReviewService {
         return result;
     }
 
+    private void saveLibraryAsDone(Member member, ReviewReq req) {
+        String isbn = req.getIsbn();
+
+        // 이미 서재에 존재하면 상태만 DONE으로 변경
+        Optional<Library> existing = libraryRepository.findByMemberAndIsbn(member, isbn);
+
+        if (existing.isPresent()) {
+            Library library = existing.get();
+            library.updateStatus(LibraryStatus.DONE); // 상태 업데이트
+            return;
+        }
+
+        // 없으면 새로 추가
+        LibraryReq libraryReq = new LibraryReqBuilder(req).buildDoneReq();
+        Library library = Library.of(member, isbn, libraryReq);
+        libraryRepository.save(library);
+    }
 }
